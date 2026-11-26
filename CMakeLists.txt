@@ -6,8 +6,13 @@ set(CMAKE_C_STANDARD 11)
 set(CMAKE_C_STANDARD_REQUIRED ON)
 add_compile_options(-Wall -Wextra -Wpedantic)
 
+find_package(PkgConfig REQUIRED)
+pkg_check_modules(CJSON REQUIRED IMPORTED_TARGET libcjson)
+find_library(CSV_LIBRARY NAMES csv REQUIRED)
+
 add_library(csvcore STATIC src/core.c)
 target_include_directories(csvcore PUBLIC src)
+target_link_libraries(csvcore PUBLIC PkgConfig::CJSON ${CSV_LIBRARY})
 
 add_executable(csv2json src/main.c)
 target_compile_definitions(csv2json PRIVATE APP_VERSION="${PROJECT_VERSION}")
