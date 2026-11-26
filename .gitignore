@@ -1,0 +1,11 @@
+build/
+dist/
+debian/
+*.o
+*.a
+*.deb
+*.gcda
+*.gcno
+.vscode/
+.idea/
+*.swp

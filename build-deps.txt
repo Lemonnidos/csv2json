@@ -1,0 +1,5 @@
+build-essential
+cmake
+pkgconf
+libcjson-dev
+libcsv-dev
