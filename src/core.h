@@ -12,6 +12,8 @@ typedef enum {
 } core_status;
 
 core_status core_convert(const char *data, size_t len, char delimiter, char **out);
+core_status core_parse_delimiter(const char *arg, char *out);
+core_status core_parse_config(const char *text, size_t len, char *delimiter);
 const char *core_strerror(core_status status);
 
 #endif
