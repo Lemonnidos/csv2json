@@ -1,5 +1,6 @@
 #!/bin/sh
 set -eu
+umask 022
 
 NAME=csv2json
 VERSION=$(cat VERSION)
