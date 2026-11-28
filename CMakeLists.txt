@@ -19,3 +19,4 @@ target_compile_definitions(csv2json PRIVATE APP_VERSION="${PROJECT_VERSION}")
 target_link_libraries(csv2json PRIVATE csvcore)
 
 install(TARGETS csv2json RUNTIME DESTINATION bin)
+install(FILES packaging/csv2json.conf DESTINATION /etc/csv2json)

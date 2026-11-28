@@ -1,0 +1,12 @@
+Package: csv2json
+Version: @VERSION@
+Section: utils
+Priority: optional
+Architecture: @ARCH@
+Depends: @DEPENDS@
+Maintainer: Lemonnidos <valentine.pipetkin@gmail.com>
+Homepage: https://github.com/Lemonnidos/csv2json
+Description: CSV to JSON converter
+ Converts CSV files with a header row to JSON.
+ The field delimiter can be chosen with the -d option
+ or in the /etc/csv2json/csv2json.conf file.

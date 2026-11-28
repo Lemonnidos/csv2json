@@ -1,0 +1,6 @@
+csv2json (0.1.0) unstable; urgency=low
+
+  * Первая версия: преобразование CSV с заголовком в JSON,
+    выбор разделителя, файл настроек /etc/csv2json/csv2json.conf.
+
+ -- Lemonnidos <valentine.pipetkin@gmail.com>  Sat, 28 Nov 2026 04:30:00 +0300
