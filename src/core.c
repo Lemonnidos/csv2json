@@ -175,3 +175,78 @@ const char *core_strerror(core_status status)
     }
     return "неизвестная ошибка";
 }
+
+core_status core_parse_delimiter(const char *arg, char *out)
+{
+    if (arg == NULL || out == NULL) {
+        return CORE_ERR_ARGS;
+    }
+    if (strcmp(arg, "\\t") == 0 || strcmp(arg, "tab") == 0) {
+        *out = '\t';
+        return CORE_OK;
+    }
+    if (strlen(arg) == 1) {
+        *out = arg[0];
+        return CORE_OK;
+    }
+    return CORE_ERR_ARGS;
+}
+
+static int is_space(char c)
+{
+    return c == ' ' || c == '\t' || c == '\r' || c == '\n';
+}
+
+core_status core_parse_config(const char *text, size_t len, char *delimiter)
+{
+    if (text == NULL || delimiter == NULL) {
+        return CORE_ERR_ARGS;
+    }
+    size_t pos = 0;
+    while (pos < len) {
+        size_t end = pos;
+        while (end < len && text[end] != '\n') {
+            end++;
+        }
+        size_t start = pos;
+        pos = end + 1;
+
+        while (start < end && is_space(text[start])) {
+            start++;
+        }
+        size_t stop = end;
+        while (stop > start && is_space(text[stop - 1])) {
+            stop--;
+        }
+        if (start == stop || text[start] == '#') {
+            continue;
+        }
+        const char *eq = memchr(text + start, '=', stop - start);
+        if (eq == NULL) {
+            continue;
+        }
+        size_t eq_pos = (size_t)(eq - text);
+        size_t key_stop = eq_pos;
+        while (key_stop > start && is_space(text[key_stop - 1])) {
+            key_stop--;
+        }
+        size_t value_start = eq_pos + 1;
+        while (value_start < stop && is_space(text[value_start])) {
+            value_start++;
+        }
+        if (key_stop - start == 9 && memcmp(text + start, "delimiter", 9) == 0) {
+            char value[8];
+            size_t value_len = stop - value_start;
+            if (value_len == 0 || value_len >= sizeof value) {
+                return CORE_ERR_ARGS;
+            }
+            memcpy(value, text + value_start, value_len);
+            value[value_len] = '\0';
+            core_status st = core_parse_delimiter(value, delimiter);
+            if (st != CORE_OK) {
+                return st;
+            }
+        }
+    }
+    return CORE_OK;
+}
