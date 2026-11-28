@@ -5,6 +5,10 @@
 
 #include "core.h"
 
+#ifndef CONFIG_PATH
+#define CONFIG_PATH "/etc/csv2json/csv2json.conf"
+#endif
+
 static void print_usage(FILE *out)
 {
     fputs("Использование:\n"
@@ -76,17 +80,25 @@ static int write_file(const char *path, const char *text)
     return rc;
 }
 
-static int parse_delimiter(const char *arg, char *out)
+static int load_config(char *delimiter)
 {
-    if (strcmp(arg, "\\t") == 0 || strcmp(arg, "tab") == 0) {
-        *out = '\t';
+    const char *path = getenv("CSV2JSON_CONF");
+    if (path == NULL) {
+        path = CONFIG_PATH;
+    }
+
+    char *data = NULL;
+    size_t len = 0;
+    if (read_file(path, &data, &len) != 0) {
         return 0;
     }
-    if (strlen(arg) == 1) {
-        *out = arg[0];
-        return 0;
+    core_status st = core_parse_config(data, len, delimiter);
+    free(data);
+    if (st != CORE_OK) {
+        fprintf(stderr, "csv2json: ошибка в файле настроек %s: недопустимый разделитель\n", path);
+        return -1;
     }
-    return -1;
+    return 0;
 }
 
 static int cmd_convert(int argc, char *argv[])
@@ -101,10 +113,14 @@ static int cmd_convert(int argc, char *argv[])
     const char *output = NULL;
     int opt;
 
+    if (load_config(&delimiter) != 0) {
+        return 1;
+    }
+
     while ((opt = getopt_long(argc, argv, "d:o:h", longopts, NULL)) != -1) {
         switch (opt) {
         case 'd':
-            if (parse_delimiter(optarg, &delimiter) != 0) {
+            if (core_parse_delimiter(optarg, &delimiter) != CORE_OK) {
                 fprintf(stderr, "csv2json: разделитель должен быть одним символом или \\t\n");
                 return 2;
             }
